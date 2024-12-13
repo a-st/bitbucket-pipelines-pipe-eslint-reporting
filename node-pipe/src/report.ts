@@ -12,7 +12,7 @@ import {
 
 const MAX_ISSUES_PER_REPORT = 1000;
 export const LOGO_URL =
-  "https://eslint.org/assets/images/logo/eslint-logo-color.svg";
+  "https://www.vectorlogo.zone/logos/eslint/eslint-icon.svg";
 
 export const generateReport = (
   bitbucketRepoOwner: string,
