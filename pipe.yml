@@ -1,0 +1,11 @@
+name: ESLint Report
+image: astraube/eslint-report-pipe:latest
+description: Reports ESLint findings in your app
+category: Code quality
+repository: https://bitbucket.org/alexander_straube/eslint-report
+tags:
+  - eslint
+  - code analysis
+  - code quality
+  - code coverage
+  - quality gate
