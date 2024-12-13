@@ -143,7 +143,7 @@ const detailsContent = (
   totalFixableErrors: number,
   totalFixableWarnings: number
 ): string =>
-  `This pull request introduces ${totalIssues} problems (${totalErrors} errors, ${totalWarnings} warnings). ` +
+  `This pull request introduces ${totalIssues} problems (${totalErrors} errors, ${totalWarnings} warnings).\n` +
   `${totalFixableErrors} errors and ${totalFixableWarnings} warnings potentially fixable with the '--fix' option.`;
 
 const createLinkUrl = (
