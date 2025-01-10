@@ -1,6 +1,6 @@
-import { putReport } from "./bitbucket-client";
+import { postAllAnnotations, putReport } from "./bitbucket-client";
 import { generateMd5Key, isDebug } from "./common/helpers";
-import { generateReport } from "./report";
+import { generateAnnotations, generateReport } from "./report";
 
 export async function main(
   bitbucketRepoOwner: string,
@@ -41,6 +41,22 @@ export async function main(
         );
       }
       return 0;
+    }
+    const codeInsightsAnnotations = generateAnnotations(
+      eslintReportGlob,
+      externalId
+    );
+    const numAnnotations = (codeInsightsAnnotations as Array<any>).length;
+
+    if (numAnnotations > 0) {
+      await postAllAnnotations(
+        bitbucketRepoOwner,
+        bitbucketRepoSlug,
+        commitHash,
+        externalId,
+        codeInsightsAnnotations
+      );
+      console.log("Added annotations to ESLint Code Insight report");
     }
   } catch (error) {
     throw new Error(error as any);

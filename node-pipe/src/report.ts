@@ -8,11 +8,9 @@ import {
   ReportResult,
   ReportType,
   Severities,
-  Severity,
-  SeverityOrder
+  Severity
 } from "./common/types";
 
-const MAX_ISSUES_PER_REPORT = 1000;
 export const LOGO_URL =
   "https://www.vectorlogo.zone/logos/eslint/eslint-icon.svg";
 
@@ -85,45 +83,41 @@ export function generateReport(
   };
 }
 
-export function parseSeverityOrder(severity: string): SeverityOrder {
-  const lcSev = severity.toLowerCase();
-  if (lcSev === "critical") {
-    return SeverityOrder.critical;
-  } else if (lcSev === "high") {
-    return SeverityOrder.high;
-  } else if (lcSev === "medium") {
-    return SeverityOrder.medium;
-  } else if (lcSev === "low") {
-    return SeverityOrder.low;
-  } else {
-    throw new Error(`invalid severity: ${severity}`);
-  }
-}
-
 export const annotationDetails = issue => {
   const detail = `ESLint Rule ID: ${issue.id}`;
   return detail;
 };
 
-export const generateAnnotations = (eslintOutput: any): object => {
-  const issues = getIssuesList(eslintOutput);
-  const targetFile = eslintOutput.displayTargetFile;
+export const generateAnnotations = (
+  eslintReportGlob: string,
+  externalId: string
+): object => {
+  const glob = new Glob(eslintReportGlob, {});
+  const eslintReports = glob.walkSync();
 
-  const sortedIssues = issues.sort((prev, next) => {
-    const prevSev = parseSeverityOrder(prev.severity);
-    const nextSev = parseSeverityOrder(next.severity);
-    return prevSev - nextSev;
-  });
+  let annotations: Array<object> = [];
+  let i = 0;
+  for (const eslintReport of eslintReports) {
+    console.log(`Processing ${eslintReport}`);
+    const rawESLintOutput = fs.readFileSync(eslintReport, "utf-8");
+    const eslintOutput = JSON.parse(rawESLintOutput);
+    const issues = getIssuesList(eslintOutput);
 
-  return sortedIssues.slice(0, MAX_ISSUES_PER_REPORT).map((issue, index) => ({
-    type: "report_annotation",
-    annotation_type: AnnotationType.VULNERABILITY, // eslint-disable-line
-    external_id: `${index}:${issue.id}`, // eslint-disable-line
-    summary: `${issue.name}@${issue.version}: ${issue.title}`,
-    severity: Severity[issue.severity],
-    path: targetFile,
-    details: annotationDetails(issue)
-  }));
+    issues.forEach(issue => {
+      issue.messages.forEach(message => {
+        annotations = annotations.concat({
+          external_id: `${externalId}.${i++}`,
+          path: message.path,
+          annotation_type: AnnotationType.CODE_SMELL,
+          summary: message.message,
+          line: message.line,
+          severity: message.severity
+        });
+      });
+    });
+  }
+
+  return annotations;
 };
 
 const getIssuesList = (eslintOutput): any => {
