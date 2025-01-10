@@ -8,4 +8,6 @@ COPY node-pipe /
 
 RUN npm install && npm run build
 
+USER node
+
 ENTRYPOINT ["/pipe.sh"]
