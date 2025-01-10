@@ -1,10 +1,12 @@
+import * as fs from "fs";
+import { Glob } from "glob";
 import * as path from "path";
 import {
+  AnnotationType,
   ReportDataType,
+  ReportHeader,
   ReportResult,
   ReportType,
-  ReportHeader,
-  AnnotationType,
   Severities,
   Severity,
   SeverityOrder
@@ -14,13 +16,15 @@ const MAX_ISSUES_PER_REPORT = 1000;
 export const LOGO_URL =
   "https://www.vectorlogo.zone/logos/eslint/eslint-icon.svg";
 
-export const generateReport = (
+export function generateReport(
   bitbucketRepoOwner: string,
   bitbucketRepoSlug: string,
   bitbucketBuildNumber: string,
-  eslintOutput: any
-): object => {
-  const issues = getIssuesList(eslintOutput);
+  eslintReportGlob: string
+): object {
+  const glob = new Glob(eslintReportGlob, {});
+  const eslintReports = glob.walkSync();
+
   let totalErrorCount = 0;
   let totalWarningCount = 0;
   let totalFixableErrorCount = 0;
@@ -30,17 +34,24 @@ export const generateReport = (
   let totalMediumSeverity = 0;
   let totalLowSeverity = 0;
 
-  issues.forEach(issue => {
-    totalErrorCount += issue.errorCount;
-    totalFixableErrorCount += issue.fixableErrorCount;
-    totalWarningCount += issue.warningCount;
-    totalFixableWarningCount += issue.fixableWarningCount;
-    issue.messages.forEach(message => {
-      totalHighSeverity += message.severity === Severity.high ? 1 : 0;
-      totalMediumSeverity += message.severity === Severity.medium ? 1 : 0;
-      totalLowSeverity += message.severity === Severity.low ? 1 : 0;
+  for (const eslintReport of eslintReports) {
+    console.log(`Processing ${eslintReport}`);
+    const rawESLintOutput = fs.readFileSync(eslintReport, "utf-8");
+    const eslintOutput = JSON.parse(rawESLintOutput);
+    const issues = getIssuesList(eslintOutput);
+
+    issues.forEach(issue => {
+      totalErrorCount += issue.errorCount;
+      totalFixableErrorCount += issue.fixableErrorCount;
+      totalWarningCount += issue.warningCount;
+      totalFixableWarningCount += issue.fixableWarningCount;
+      issue.messages.forEach(message => {
+        totalHighSeverity += message.severity === Severity.high ? 1 : 0;
+        totalMediumSeverity += message.severity === Severity.medium ? 1 : 0;
+        totalLowSeverity += message.severity === Severity.low ? 1 : 0;
+      });
     });
-  });
+  }
 
   const totalIssues = totalErrorCount + totalWarningCount;
   const reportResult = totalIssues ? ReportResult.FAILED : ReportResult.PASSED;
@@ -72,7 +83,7 @@ export const generateReport = (
       totalLowSeverity
     )
   };
-};
+}
 
 export function parseSeverityOrder(severity: string): SeverityOrder {
   const lcSev = severity.toLowerCase();
@@ -131,8 +142,6 @@ const getIssuesList = (eslintOutput): any => {
     issues = issues.concat(output);
   });
 
-  console.log(issues);
-
   return issues;
 };
 
@@ -143,7 +152,7 @@ const detailsContent = (
   totalFixableErrors: number,
   totalFixableWarnings: number
 ): string =>
-  `This pull request introduces ${totalIssues} problems (${totalErrors} errors, ${totalWarnings} warnings).\n` +
+  `This pull request introduces ${totalIssues} problems (${totalErrors} errors, ${totalWarnings} warnings). ` +
   `${totalFixableErrors} errors and ${totalFixableWarnings} warnings potentially fixable with the '--fix' option.`;
 
 const createLinkUrl = (

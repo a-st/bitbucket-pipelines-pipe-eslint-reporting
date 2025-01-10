@@ -1,45 +1,26 @@
-import * as fs from "fs";
+import { putReport } from "./bitbucket-client";
 import { generateMd5Key, isDebug } from "./common/helpers";
-import { generateReport, generateAnnotations } from "./report";
-import {
-  postAllAnnotations,
-  putReport,
-  BitbucketApiResponse
-} from "./bitbucket-client";
+import { generateReport } from "./report";
 
 export async function main(
   bitbucketRepoOwner: string,
   bitbucketRepoSlug: string,
   commitHash: string,
   bitbucketBuildNumber: string,
-  eslintOutputFilePath: string,
-  generateReport: Function, // eslint-disable-line
-  sendReport: (
-    bitbucketTeam: string,
-    repoSlug: string,
-    commitHash: string,
-    externalId: string,
-    reportPayload: any
-  ) => Promise<BitbucketApiResponse>,
-  generateAnnotations: (any) => object,
-  sendAnnotations: Function // eslint-disable-line
+  eslintReportGlob: string
 ) {
-  let rawESLintOutput = "";
+  console.log("Start generating ESLint Code Insight report...");
   try {
-    console.log("Start generating Code Insight report...");
-    rawESLintOutput = fs.readFileSync(eslintOutputFilePath, "utf-8");
-    const eslintOutput = JSON.parse(rawESLintOutput);
-
     const codeInsightReport = generateReport(
       bitbucketRepoOwner,
       bitbucketRepoSlug,
       bitbucketBuildNumber,
-      eslintOutput
+      eslintReportGlob
     );
     const reportType = "test";
     const externalId = generateMd5Key(`${reportType}:${commitHash}`);
 
-    const sendReportResult = await sendReport(
+    const sendReportResult = await putReport(
       bitbucketRepoOwner,
       bitbucketRepoSlug,
       commitHash,
@@ -51,7 +32,7 @@ export async function main(
       sendReportResult.statusCode === 200 ||
       sendReportResult.statusCode === 201
     ) {
-      console.log("Code Insight report successfully generated!");
+      console.log("ESLint Code Insight report successfully generated!");
     } else {
       console.log(sendReportResult);
       if (!process.env.DONT_BREAK_BUILD) {
@@ -61,22 +42,7 @@ export async function main(
       }
       return 0;
     }
-
-    const codeInsightsAnnotations = generateAnnotations(eslintOutput);
-    const numAnnotations = (codeInsightsAnnotations as Array<any>).length;
-
-    if (numAnnotations > 0) {
-      await sendAnnotations(
-        bitbucketRepoOwner,
-        bitbucketRepoSlug,
-        commitHash,
-        externalId,
-        codeInsightsAnnotations
-      );
-      console.log("Added annotations to CodeInsights report");
-    }
   } catch (error) {
-    console.log(rawESLintOutput);
     throw new Error(error as any);
   }
 
@@ -105,10 +71,6 @@ if (require.main === module) {
     bitbucketRepoSlug,
     commitHash,
     bitbucketBuildNumber,
-    eslintOutputFilePath,
-    generateReport,
-    putReport,
-    generateAnnotations,
-    postAllAnnotations
+    eslintOutputFilePath
   );
 }

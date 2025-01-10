@@ -1,4 +1,5 @@
-import { AxiosInstance } from "axios";
+import axios, { AxiosInstance } from "axios";
+import * as bitbucketClient from "../../bitbucket-client";
 import { BitbucketApiResponse } from "../../bitbucket-client";
 
 const bitbucketRepoOwner = "myteam";
@@ -17,11 +18,10 @@ test("test postAnnotations can submit annotations", async () => {
     .fn()
     .mockResolvedValue({ status: 200, data: { name: "fake-response" } });
   const getMockedAxiosInstance = (): AxiosInstance => {
-    const a = require("axios");
+    const a = axios.create();
     a.post = mockAxiosPost;
     return a;
   };
-  const bitbucketClient = require("../../bitbucket-client");
   const res: BitbucketApiResponse = await bitbucketClient.postAnnotations(
     bitbucketRepoOwner,
     bitbucketRepoSlug,
@@ -40,11 +40,10 @@ test("test putReport can submit a report", async () => {
     .fn()
     .mockResolvedValue({ status: 200, data: { name: "fake-response" } });
   const getMockedAxiosInstance = (): AxiosInstance => {
-    const a = require("axios");
+    const a = axios.create();
     a.put = mockAxiosPut;
     return a;
   };
-  const bitbucketClient = require("../../bitbucket-client");
   const res: BitbucketApiResponse = await bitbucketClient.putReport(
     bitbucketRepoOwner,
     bitbucketRepoSlug,
@@ -66,11 +65,10 @@ test("postAnnotations fails in an expected way", async () => {
     }
   });
   const getMockedAxiosInstance = (): AxiosInstance => {
-    const a = require("axios");
+    const a = axios.create();
     a.post = mockAxiosPost;
     return a;
   };
-  const bitbucketClient = require("../../bitbucket-client");
   const promiseResponse: Promise<BitbucketApiResponse> = bitbucketClient.postAnnotations(
     bitbucketRepoOwner,
     bitbucketRepoSlug,
@@ -98,11 +96,10 @@ test("putReport fails in an expected way", async () => {
     }
   });
   const getMockedAxiosInstance = (): AxiosInstance => {
-    const a = require("axios");
+    const a = axios.create();
     a.put = mockAxiosPut;
     return a;
   };
-  const bitbucketClient = require("../../bitbucket-client");
   const promiseResponse: Promise<BitbucketApiResponse> = bitbucketClient.putReport(
     bitbucketRepoOwner,
     bitbucketRepoSlug,
@@ -126,7 +123,6 @@ test("chunking works correctly when posting annotations", async () => {
   // fill an array with > 1000 things and call postAllAnnotations and make sure we call postAnnotations exactly 10 times
   const a = Array(1200);
   a.fill("fakeAnnotation");
-  const bitbucketClient = require("../../bitbucket-client");
   const mockPostAnnotations = jest.fn().mockResolvedValue({ statusCode: 200 });
   await bitbucketClient.postAllAnnotations(
     "",
