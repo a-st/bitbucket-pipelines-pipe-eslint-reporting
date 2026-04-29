@@ -8,7 +8,7 @@ This pipe publishes ESLint findings as Code Insights for Bitbucket Pipelines
 Add the following snippet to the script section of your `bitbucket-pipelines.yml` file:
 
 ```yaml
-- pipe: docker://astraube/eslint-report-pipe:latest
+- pipe: docker://ghcr.io/a-st/bitbucket-pipelines-pipe-eslint-reporting:latest
   variables:
     ESLINT_TEST_JSON_INPUT: "<string>" # Required. The filename or path of a JSON file containg the output from running ESLint (with json output option).
 ```
@@ -42,7 +42,7 @@ pipelines:
     - step:
         name: ESLint Reporting
         script:
-          - pipe: docker://astraube/eslint-report-pipe:latest
+          - pipe: docker://ghcr.io/a-st/bitbucket-pipelines-pipe-eslint-reporting:latest
             variables:
               ESLINT_TEST_JSON_INPUT: '**/eslint-report.json'
 ```
