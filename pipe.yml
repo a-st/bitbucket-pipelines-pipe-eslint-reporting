@@ -1,8 +1,8 @@
 name: ESLint Report
-image: astraube/eslint-report-pipe:latest
+image: ghcr.io/a-st/bitbucket-pipelines-pipe-eslint-reporting:latest
 description: Reports ESLint findings in your app
 category: Code quality
-repository: https://bitbucket.org/alexander_straube/eslint-report
+repository: https://github.com/a-st/bitbucket-pipelines-pipe-eslint-reporting
 tags:
   - eslint
   - code analysis
