@@ -38,5 +38,8 @@
     "prettier": "^3.9.10",
     "ts-jest": "^29.4.15",
     "typescript": "<8.0.0"
+  },
+  "overrides": {
+    "minimatch": "11.0.4"
   }
 }
