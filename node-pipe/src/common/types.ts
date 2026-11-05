@@ -2,7 +2,7 @@ export enum ReportType {
   SECURITY = "SECURITY",
   COVERAGE = "COVERAGE",
   TEST = "TEST",
-  BUG = "BUG"
+  BUG = "BUG",
 }
 
 export enum ReportDataType {
@@ -12,12 +12,12 @@ export enum ReportDataType {
   LINK = "LINK",
   NUMBER = "NUMBER",
   PERCENTAGE = "PERCENTAGE",
-  TEXT = "TEXT"
+  TEXT = "TEXT",
 }
 
 export enum ReportResult {
   PASSED = "PASSED",
-  FAILED = "FAILED"
+  FAILED = "FAILED",
 }
 
 export enum ReportHeader {
@@ -26,31 +26,31 @@ export enum ReportHeader {
   HIGH_SEVERITY = "High severity",
   MEDIUM_SEVERITY = "Medium severity",
   LOW_SEVERITY = "Low severity",
-  ESLINT = "ESLint"
+  ESLINT = "ESLint",
 }
 
 export enum AnnotationType {
   VULNERABILITY = "VULNERABILITY",
   CODE_SMELL = "CODE_SMELL",
-  BUG = "BUG"
+  BUG = "BUG",
 }
 
 export enum Severity {
   low = "LOW",
   medium = "MEDIUM",
   high = "HIGH",
-  critical = "CRITICAL"
+  critical = "CRITICAL",
 }
 
 export const Severities = {
   0: Severity.low,
   1: Severity.medium,
-  2: Severity.high
+  2: Severity.high,
 };
 
 export enum SeverityOrder {
   critical,
   high,
   medium,
-  low
+  low,
 }

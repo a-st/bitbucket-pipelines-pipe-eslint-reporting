@@ -7,7 +7,7 @@ export async function main(
   bitbucketRepoSlug: string,
   commitHash: string,
   bitbucketBuildNumber: string,
-  eslintReportGlob: string
+  eslintReportGlob: string,
 ) {
   console.log("Start generating ESLint Code Insight report...");
   try {
@@ -15,7 +15,7 @@ export async function main(
       bitbucketRepoOwner,
       bitbucketRepoSlug,
       bitbucketBuildNumber,
-      eslintReportGlob
+      eslintReportGlob,
     );
     const reportType = "test";
     const externalId = generateMd5Key(`${reportType}:${commitHash}`);
@@ -25,7 +25,7 @@ export async function main(
       bitbucketRepoSlug,
       commitHash,
       externalId,
-      codeInsightReport
+      codeInsightReport,
     );
 
     if (
@@ -37,14 +37,14 @@ export async function main(
       console.log(sendReportResult);
       if (!process.env.DONT_BREAK_BUILD) {
         throw new Error(
-          `Bitbucket API returned unsuccessful response code: ${sendReportResult.statusCode}`
+          `Bitbucket API returned unsuccessful response code: ${sendReportResult.statusCode}`,
         );
       }
       return 0;
     }
     const codeInsightsAnnotations = generateAnnotations(
       eslintReportGlob,
-      externalId
+      externalId,
     );
     const numAnnotations = (codeInsightsAnnotations as Array<any>).length;
 
@@ -54,12 +54,14 @@ export async function main(
         bitbucketRepoSlug,
         commitHash,
         externalId,
-        codeInsightsAnnotations
+        codeInsightsAnnotations,
       );
       console.log("Added annotations to ESLint Code Insight report");
     }
   } catch (error) {
-    throw new Error(error as any);
+    throw new Error("Failed generating ESLint Code Insight report!", {
+      cause: error,
+    });
   }
 
   return 0;
@@ -87,6 +89,6 @@ if (require.main === module) {
     bitbucketRepoSlug,
     commitHash,
     bitbucketBuildNumber,
-    eslintOutputFilePath
+    eslintOutputFilePath,
   );
 }

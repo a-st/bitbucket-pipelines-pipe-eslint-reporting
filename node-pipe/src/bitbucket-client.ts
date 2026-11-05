@@ -15,8 +15,8 @@ export function getProxiedAxiosInstance(): AxiosInstance {
   return axios.create({
     proxy: {
       host: BITBUCKET_API_PROXY_HOST,
-      port: BITBUCKET_API_PROXY_PORT
-    }
+      port: BITBUCKET_API_PROXY_PORT,
+    },
   });
 }
 
@@ -24,7 +24,7 @@ export function getReportPutUrl(
   bitbucketRepoOwner: string,
   bitbucketRepoSlug: string,
   commitHash: string,
-  reportExternalId: string
+  reportExternalId: string,
 ): string {
   return `http://${BITBUCKET_API_HOSTNAME}/2.0/repositories/${bitbucketRepoOwner}/${bitbucketRepoSlug}/commit/${commitHash}/reports/${reportExternalId}`;
 }
@@ -33,7 +33,7 @@ export function getAnnotationsPostUrl(
   bitbucketRepoOwner: string,
   bitbucketRepoSlug: string,
   commitHash: string,
-  reportExternalId: string
+  reportExternalId: string,
 ): string {
   return `http://${BITBUCKET_API_HOSTNAME}/2.0/repositories/${bitbucketRepoOwner}/${bitbucketRepoSlug}/commit/${commitHash}/reports/${reportExternalId}/annotations`;
 }
@@ -44,14 +44,14 @@ export async function putReport(
   commitHash: string,
   reportExternalId: string,
   reportPayload: any,
-  getAxiosInstance: () => AxiosInstance = getProxiedAxiosInstance
+  getAxiosInstance: () => AxiosInstance = getProxiedAxiosInstance,
 ): Promise<BitbucketApiResponse> {
   const proxiedAxios = getAxiosInstance();
   const url = getReportPutUrl(
     bitbucketRepoOwner,
     bitbucketRepoSlug,
     commitHash,
-    reportExternalId
+    reportExternalId,
   );
   return put(proxiedAxios, url, reportPayload);
 }
@@ -68,8 +68,8 @@ export async function postAllAnnotations(
     bitbucketRepoSlug: string,
     commitHash: string,
     reportExternalId: string,
-    annotationsPayload: any
-  ) => Promise<BitbucketApiResponse> = postAnnotations
+    annotationsPayload: any,
+  ) => Promise<BitbucketApiResponse> = postAnnotations,
 ) {
   const arrayAnnotations = codeInsightsAnnotations as Array<any>;
   const chunkedAnnotations = _.chunk(arrayAnnotations.slice(0, 1000), 100);
@@ -82,7 +82,7 @@ export async function postAllAnnotations(
         bitbucketRepoSlug,
         commitHash,
         reportExternalId,
-        nextBatchOf100Annotations
+        nextBatchOf100Annotations,
       );
     } catch (e) {
       if (!process.env.DONT_BREAK_BUILD) {
@@ -109,14 +109,14 @@ export async function postAnnotations(
   commitHash: string,
   reportExternalId: string,
   codeInsightsAnnotations: any,
-  getAxiosInstance: () => AxiosInstance = getProxiedAxiosInstance
+  getAxiosInstance: () => AxiosInstance = getProxiedAxiosInstance,
 ): Promise<BitbucketApiResponse> {
   const proxiedAxios = getAxiosInstance();
   const url = getAnnotationsPostUrl(
     bitbucketRepoOwner,
     bitbucketRepoSlug,
     commitHash,
-    reportExternalId
+    reportExternalId,
   );
   const arrayAnnotations = codeInsightsAnnotations as Array<any>;
   if (arrayAnnotations.length > 100) {
@@ -131,7 +131,7 @@ export async function postAnnotations(
 export async function put(
   axiosInstance: AxiosInstance,
   url: string,
-  postBody: any
+  postBody: any,
 ): Promise<BitbucketApiResponse> {
   try {
     const axiosResponse = await axiosInstance.put(url, postBody);
@@ -139,7 +139,7 @@ export async function put(
     return {
       success: true,
       statusCode: axiosResponse.status,
-      jsonObj: responseObj
+      jsonObj: responseObj,
     };
   } catch (err) {
     console.log(err);
@@ -149,7 +149,7 @@ export async function put(
     return {
       success: false,
       statusCode: 0,
-      jsonObj: {}
+      jsonObj: {},
     };
   }
 }
@@ -157,7 +157,7 @@ export async function put(
 export async function post(
   axiosInstance: AxiosInstance,
   url: string,
-  postBody: any
+  postBody: any,
 ): Promise<BitbucketApiResponse> {
   try {
     const axiosResponse = await axiosInstance.post(url, postBody);
@@ -165,7 +165,7 @@ export async function post(
     return {
       success: true,
       statusCode: axiosResponse.status,
-      jsonObj: responseObj
+      jsonObj: responseObj,
     };
   } catch (err) {
     console.log(err);
@@ -175,7 +175,7 @@ export async function post(
     return {
       success: false,
       statusCode: 0,
-      jsonObj: {}
+      jsonObj: {},
     };
   }
 }

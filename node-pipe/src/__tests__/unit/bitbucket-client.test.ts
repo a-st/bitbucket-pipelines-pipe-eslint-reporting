@@ -7,10 +7,10 @@ const bitbucketRepoSlug = "myrepo";
 const commitHash = "not-a-commit-hash";
 const reportExternalId = "sample-report-external-id";
 const fakeAnnotations = {
-  name: "test"
+  name: "test",
 };
 const fakeReport = {
-  name: "my-fake-report"
+  name: "my-fake-report",
 };
 
 test("test postAnnotations can submit annotations", async () => {
@@ -28,7 +28,7 @@ test("test postAnnotations can submit annotations", async () => {
     commitHash,
     reportExternalId,
     fakeAnnotations,
-    getMockedAxiosInstance
+    getMockedAxiosInstance,
   );
   expect(res.statusCode).toBe(200);
   expect(res.jsonObj.name).toBe("fake-response");
@@ -50,7 +50,7 @@ test("test putReport can submit a report", async () => {
     commitHash,
     reportExternalId,
     fakeReport,
-    getMockedAxiosInstance
+    getMockedAxiosInstance,
   );
   expect(res.statusCode).toBe(200);
   expect(res.jsonObj.name).toBe("fake-response");
@@ -61,27 +61,28 @@ test("postAnnotations fails in an expected way", async () => {
   const mockAxiosPost = jest.fn().mockRejectedValue({
     response: {
       status: 404,
-      statusText: "Not Found"
-    }
+      statusText: "Not Found",
+    },
   });
   const getMockedAxiosInstance = (): AxiosInstance => {
     const a = axios.create();
     a.post = mockAxiosPost;
     return a;
   };
-  const promiseResponse: Promise<BitbucketApiResponse> = bitbucketClient.postAnnotations(
-    bitbucketRepoOwner,
-    bitbucketRepoSlug,
-    commitHash,
-    reportExternalId,
-    fakeAnnotations,
-    getMockedAxiosInstance
-  );
+  const promiseResponse: Promise<BitbucketApiResponse> =
+    bitbucketClient.postAnnotations(
+      bitbucketRepoOwner,
+      bitbucketRepoSlug,
+      commitHash,
+      reportExternalId,
+      fakeAnnotations,
+      getMockedAxiosInstance,
+    );
   promiseResponse
     .then(() => {
       fail("should not return successful response");
     })
-    .catch(err => {
+    .catch((err) => {
       expect(err.response.status).toBe(404);
       expect(err.response.statusText).toBe("Not Found");
       expect(mockAxiosPost).toHaveBeenCalledTimes(1);
@@ -92,27 +93,28 @@ test("putReport fails in an expected way", async () => {
   const mockAxiosPut = jest.fn().mockRejectedValue({
     response: {
       status: 404,
-      statusText: "Not Found"
-    }
+      statusText: "Not Found",
+    },
   });
   const getMockedAxiosInstance = (): AxiosInstance => {
     const a = axios.create();
     a.put = mockAxiosPut;
     return a;
   };
-  const promiseResponse: Promise<BitbucketApiResponse> = bitbucketClient.putReport(
-    bitbucketRepoOwner,
-    bitbucketRepoSlug,
-    commitHash,
-    reportExternalId,
-    fakeReport,
-    getMockedAxiosInstance
-  );
+  const promiseResponse: Promise<BitbucketApiResponse> =
+    bitbucketClient.putReport(
+      bitbucketRepoOwner,
+      bitbucketRepoSlug,
+      commitHash,
+      reportExternalId,
+      fakeReport,
+      getMockedAxiosInstance,
+    );
   promiseResponse
     .then(() => {
       fail("should not return successful response");
     })
-    .catch(err => {
+    .catch((err) => {
       expect(err.response.status).toBe(404);
       expect(err.response.statusText).toBe("Not Found");
       expect(mockAxiosPut).toHaveBeenCalledTimes(1);
@@ -130,7 +132,7 @@ test("chunking works correctly when posting annotations", async () => {
     "",
     "",
     a,
-    mockPostAnnotations
+    mockPostAnnotations,
   );
   expect(mockPostAnnotations).toHaveBeenCalledTimes(10);
 });
